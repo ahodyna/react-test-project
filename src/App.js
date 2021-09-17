@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import PostItem from './components/PostItem';
+import React, {useState } from 'react';
+import PostForm from './components/PostForm';
 import PostList from './components/PostList';
-import MyButton from './components/UI/button/MyButton';
+
 import './styles/app.css'
 
 function App() {
@@ -13,16 +13,15 @@ function App() {
     { id: 4, title: 'JS 4', body: 'Description' },
     { id: 5, title: 'JS 5', body: 'Description' }
   ])
+const createPost = (newPost) => {
+  setPosts([...posts, newPost])
+}
+
 
   return (
     <div className="App">
 
-      <form>
-        <input type="text" placeholder="title" />
-        <input type="text" placeholder="description" />
-        <MyButton disabled>Create</MyButton>
-      </form>
-
+      <PostForm create={createPost}/>
       <PostList posts={posts} title="List of Post 1" />
 
     </div>
