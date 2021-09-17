@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import PostItem from './components/PostItem';
+import PostList from './components/PostList';
+import MyButton from './components/UI/button/MyButton';
 import './styles/app.css'
 
 function App() {
@@ -14,9 +16,15 @@ function App() {
 
   return (
     <div className="App">
-      {posts.map(post =>
-        <PostItem post={post} key={post.id} />
-      )}
+
+      <form>
+        <input type="text" placeholder="title" />
+        <input type="text" placeholder="description" />
+        <MyButton disabled>Create</MyButton>
+      </form>
+
+      <PostList posts={posts} title="List of Post 1" />
+
     </div>
   );
 }
