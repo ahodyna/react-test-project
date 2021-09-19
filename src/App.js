@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import PostFilter from './components/PostFilter';
 import PostForm from './components/PostForm';
 import PostList from './components/PostList';
-import MySelect from './components/UI/select/MySelect';
+
 
 import './styles/app.css'
 
@@ -14,8 +15,20 @@ function App() {
     { id: 4, title: 'tJS 4', body: 'Description' },
     { id: 5, title: 'aJS 5', body: 'qDescription' }
   ])
+  const [filter, setFilter] = useState({ sort: '', query: '' })
 
-  const [selectedSort, setSelectedSort] = useState('')
+
+  const sortedPost = useMemo(() => {
+
+    if (filter.sort) {
+      return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
+    }
+    return posts
+  }, [filter.sort, posts])
+
+  const sortedAndSerchedPosts = useMemo(() => {
+    return sortedPost.filter(post => post.title.toLowerCase().includes(filter.query))
+  }, [filter.query, sortedPost])
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
@@ -25,30 +38,22 @@ function App() {
     setPosts(posts.filter(p => p.id !== post.id))
   }
 
-  const sortPosts = (sort) => {
-    setSelectedSort(sort)
-    setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])))
-  }
-
-
   return (
     <div className="App">
 
       <PostForm create={createPost} />
       <hr style={{ margin: '15px 0' }} />
-      <div>
 
-        <MySelect
-          value={selectedSort}
-          onChange={sortPosts}
-          defaultValue="Sort by"
-          options={[
-            { value: 'title', name: 'name' },
-            { value: 'body', name: 'description' },
-          ]}></MySelect>
-      </div>
-      {posts.length !== 0 ? <PostList remove={removePost} posts={posts} title="List of Post 1" />
-        : <h2 style={{ textAlign: 'center' }}>Not found</h2>}
+      <PostFilter
+        filter={filter}
+        setFilter={setFilter}
+      />
+
+      {sortedAndSerchedPosts.length
+        ?
+        <PostList remove={removePost} posts={sortedAndSerchedPosts} title="List of Post 1" />
+        :
+        <h2 style={{ textAlign: 'center' }}>Not found</h2>}
 
 
     </div>
