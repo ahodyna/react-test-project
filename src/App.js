@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { usePosts } from './hooks/usePosts';
+import {useFetching} from './hooks/useFetching';
 import PostFilter from './components/PostFilter';
 import PostForm from './components/PostForm';
 import PostList from './components/PostList';
 import MyButton from './components/UI/button/MyButton';
 import MyModal from './components/UI/modal/MyModal';
-
 
 import './styles/app.css'
 import PostService from './API/PostService';
@@ -17,25 +17,19 @@ function App() {
   const [filter, setFilter] = useState({ sort: '', query: '' });
   const [modal, setModal] = useState(false);
   const sortedAndSerchedPosts = usePosts(posts, filter.sort, filter.query);
-  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
+    const posts = await PostService.getAll();
+    setPosts(posts.data)
+  })
 
   useEffect(() => {
     fetchPosts()
   }, [])
 
-
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
     setModal(false)
   }
-
-  async function fetchPosts() {
-    setIsPostsLoading(true)
-    const posts = await PostService.getAll();
-    setPosts(posts.data)
-    setIsPostsLoading(false)
-  }
-
 
   const removePost = (post) => {
     setPosts(posts.filter(p => p.id !== post.id))
@@ -52,8 +46,12 @@ function App() {
         filter={filter}
         setFilter={setFilter}
       />
+      {postError && 
+      <h2>Smth went wrong...{postError}</h2>
+  
+      }
       {isPostsLoading
-        ? <div style={{ display: 'flex', justifyContent: 'center' , marginTop: 50}}> <Loader /></div>
+        ? <div style={{ display: 'flex', justifyContent: 'center', marginTop: 50 }}> <Loader /></div>
         : <PostList remove={removePost} posts={sortedAndSerchedPosts} title="List of Post 1" />
       }
 
